@@ -47,14 +47,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand column */}
           <div className="space-y-4">
-            {/* Text logo */}
+            {/* Logo */}
             <div>
-              <p className="text-2xl font-extrabold tracking-tight leading-none">
-                <span className="text-[#C8102E]">Lakshya</span>
-              </p>
-              <p className="text-[10px] font-semibold text-[#F5C518] tracking-widest uppercase mt-0.5">
-                IIT-JEE / NEET / Foundation
-              </p>
+              <img
+                src="images/footer-logo.png"
+                alt="Lakshya — IIT-JEE / NEET / Foundation"
+                className="h-16 w-auto object-contain"
+              />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
               Empowering students since 2005 with focused IIT-JEE, NEET, and Foundation coaching. 
@@ -113,11 +112,11 @@ export default function Footer() {
           {[
             {
               icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
-              text: "123, Coaching Nagar, Kota, Rajasthan – 324005",
+              text: "Jindal Complex, Near Blackstone, Bus Stand Road, Mubarik Mehal Colony, Sangrur, Punjab — 148001",
             },
             {
               icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
-              text: "+91 98765 43210",
+              text: "+91 98233-00034, +91 97679-00030",
             },
             {
               icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",

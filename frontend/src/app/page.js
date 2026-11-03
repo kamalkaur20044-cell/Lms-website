@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import HeroBanner from "@/components/HeroBanner";
 
 /* ─── Data ────────────────────────────────────────────────────── */
 
@@ -231,117 +232,19 @@ export default function Home() {
       <Navbar />
 
       <main>
-        {/* ── 1. HERO ─────────────────────────────────────────── */}
-        <section className="hero-gradient overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left */}
-              <div className="space-y-6">
-                {/* Pill badge */}
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#C8102E]/10 text-[#C8102E] text-sm font-semibold rounded-full border border-[#C8102E]/20">
-                  <span className="w-2 h-2 rounded-full bg-[#C8102E] animate-pulse" />
-                  Admissions Open 2025–26
-                </span>
-
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1a1a2e] leading-tight">
-                  Crack{" "}
-                  <span className="text-[#C8102E] relative">
-                    IIT-JEE
-                    <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6" preserveAspectRatio="none">
-                      <path d="M0 5 Q100 0 200 5" stroke="#F5C518" strokeWidth="3" fill="none" strokeLinecap="round" />
-                    </svg>
-                  </span>{" "}
-                  &amp;{" "}
-                  <span className="text-[#C8102E]">NEET</span>{" "}
-                  with India's Most Trusted Coaching
-                </h1>
-
-                <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                  Join over <strong>50,000+ students</strong> who chose Lakshya for expert faculty,
-                  structured study plans, and a proven track record of{" "}
-                  <strong>1000+ IIT selections</strong> in the last decade.
-                </p>
-
-                <div className="flex flex-wrap gap-4">
-                  <Link
-                    href="#courses"
-                    className="px-7 py-3.5 bg-[#C8102E] text-white font-bold rounded-full hover:bg-[#a50d25] transition-all duration-200 shadow-lg shadow-red-200 hover:shadow-red-300 hover:-translate-y-0.5"
-                  >
-                    Explore Courses
-                  </Link>
-                  <Link
-                    href="#about"
-                    className="px-7 py-3.5 border-2 border-[#1a1a2e] text-[#1a1a2e] font-bold rounded-full hover:bg-[#1a1a2e] hover:text-white transition-all duration-200"
-                  >
-                    Know More
-                  </Link>
-                </div>
-
-                {/* Trust indicators */}
-                <div className="flex flex-wrap gap-5 pt-2">
-                  {[
-                    { icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", text: "CBSE & State Board Aligned" },
-                    { icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z", text: "IITian & Doctor Faculty" },
-                    { icon: "M13 10V3L4 14h7v7l9-11h-7z", text: "Live + Recorded Classes" },
-                  ].map(({ icon, text }) => (
-                    <div key={text} className="flex items-center gap-2 text-sm text-gray-600">
-                      <svg className="w-4 h-4 text-[#C8102E] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-                      </svg>
-                      {text}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right — stats card cluster */}
-              <div className="relative flex justify-center lg:justify-end">
-                <div className="relative w-full max-w-md">
-                  {/* Central card */}
-                  <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-                    <div className="text-center mb-6">
-                      <div className="w-20 h-20 bg-gradient-to-br from-[#C8102E] to-red-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-200">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
-                        </svg>
-                      </div>
-                      <h3 className="text-2xl font-bold text-[#1a1a2e]">Lakshya Institute</h3>
-                      <p className="text-[#C8102E] font-semibold text-sm mt-1">IIT-JEE · NEET · Foundation</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      {stats.map(({ value, label }) => (
-                        <div key={label} className="bg-gray-50 rounded-xl p-4 text-center">
-                          <p className="text-2xl font-extrabold text-[#C8102E]">{value}</p>
-                          <p className="text-xs text-gray-500 mt-0.5 leading-tight">{label}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Floating badge top-right */}
-                  <div className="absolute -top-4 -right-4 bg-[#F5C518] text-[#1a1a2e] px-4 py-2 rounded-full text-xs font-bold shadow-lg rotate-6">
-                    🏆 #1 in Kota
-                  </div>
-
-                  {/* Floating badge bottom-left */}
-                  <div className="absolute -bottom-4 -left-4 bg-white border border-green-200 px-4 py-2 rounded-full text-xs font-semibold text-green-700 shadow-lg flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500" />
-                    New batch starting soon
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* ── 1. HERO BANNER CAROUSEL ─────────────────────── */}
+        <HeroBanner />
 
         {/* ── 2. STATS STRIP ──────────────────────────────────── */}
-        <section className="bg-[#1a1a2e]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map(({ value, label }) => (
-                <div key={label} className="text-center">
-                  <p className="text-3xl font-extrabold text-[#F5C518]">{value}</p>
-                  <p className="text-sm text-gray-400 mt-1">{label}</p>
+        <section className="bg-gradient-to-r from-[#C8102E] to-red-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/20">
+              {stats.map(({ value, label }, i) => (
+                <div key={label} className="flex flex-col items-center justify-center py-6 px-4 gap-1 relative group hover:bg-white/10 transition-colors">
+                  <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{value}</p>
+                  <p className="text-xs sm:text-sm text-red-100 font-medium text-center">{label}</p>
+                  {/* bottom accent line on hover */}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#F5C518] group-hover:w-2/3 transition-all duration-300 rounded-full" />
                 </div>
               ))}
             </div>

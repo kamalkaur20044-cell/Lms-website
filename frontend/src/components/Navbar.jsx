@@ -5,11 +5,11 @@ import Link from "next/link";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Courses", href: "#courses" },
-  { label: "About Us", href: "#about" },
-  { label: "Faculty", href: "#faculty" },
-  { label: "Results", href: "#results" },
-  { label: "Contact", href: "#contact" },
+  { label: "Courses", href: "/courses" },
+  { label: "About Us", href: "/about" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Results", href: "/#results" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -21,15 +21,14 @@ export default function Navbar() {
       <div className="h-1 w-full yellow-bar" />
 
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0 leading-none">
-            <span className="text-2xl font-extrabold tracking-tight">
-              <span className="text-[#000]">Lakshya</span>
-            </span>
-            <p className="text-[10px] font-semibold text-[#C8102E] tracking-widest uppercase leading-none mt-0.5">
-              IIT-JEE / NEET / Foundation
-            </p>
+          <Link href="/" className="flex-shrink-0">
+            <img
+              src="images/logo.png"
+              alt="Lakshya — IIT-JEE / NEET / Foundation"
+              className="h-16 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop nav links */}
