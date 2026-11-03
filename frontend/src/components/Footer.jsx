@@ -47,36 +47,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand column */}
           <div className="space-y-4">
-            {/* Logo SVG */}
+            {/* Text logo */}
             <div>
-              <svg
-                width="150"
-                height="46"
-                viewBox="0 0 140 44"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-label="Lakshya logo"
-              >
-                <path
-                  d="M18 8 Q55 0 120 10"
-                  stroke="#F5C518"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <text x="6" y="34" fontFamily="Georgia, serif" fontSize="30" fontWeight="bold" fill="#C8102E">
-                  L
-                </text>
-                <text x="28" y="34" fontFamily="Georgia, serif" fontSize="22" fontWeight="bold" fill="#ffffff">
-                  akshya
-                </text>
-                <text x="122" y="14" fontSize="8" fill="#aaa" fontFamily="Arial, sans-serif">
-                  TM
-                </text>
-                <text x="28" y="43" fontFamily="Arial, sans-serif" fontSize="7.5" fill="#F5C518" letterSpacing="0.5">
-                  IIT-JEE / NEET / Foundation
-                </text>
-              </svg>
+              <p className="text-2xl font-extrabold tracking-tight leading-none">
+                <span className="text-[#C8102E]">Lakshya</span>
+              </p>
+              <p className="text-[10px] font-semibold text-[#F5C518] tracking-widest uppercase mt-0.5">
+                IIT-JEE / NEET / Foundation
+              </p>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
               Empowering students since 2005 with focused IIT-JEE, NEET, and Foundation coaching. 

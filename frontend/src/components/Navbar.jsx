@@ -23,64 +23,13 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            {/* SVG logo replicating the Lakshya brand mark */}
-            <div className="flex items-center">
-              <svg
-                width="140"
-                height="44"
-                viewBox="0 0 140 44"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-label="Lakshya logo"
-              >
-                {/* Yellow swoosh */}
-                <path
-                  d="M18 8 Q55 0 120 10"
-                  stroke="#F5C518"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                {/* Big red L */}
-                <text
-                  x="6"
-                  y="34"
-                  fontFamily="Georgia, serif"
-                  fontSize="30"
-                  fontWeight="bold"
-                  fill="#C8102E"
-                >
-                  L
-                </text>
-                {/* "akshya" text */}
-                <text
-                  x="28"
-                  y="34"
-                  fontFamily="Georgia, serif"
-                  fontSize="22"
-                  fontWeight="bold"
-                  fill="#1a1a2e"
-                >
-                  akshya
-                </text>
-                {/* TM mark */}
-                <text x="122" y="14" fontSize="8" fill="#666" fontFamily="Arial, sans-serif">
-                  TM
-                </text>
-                {/* Tagline */}
-                <text
-                  x="28"
-                  y="43"
-                  fontFamily="Arial, sans-serif"
-                  fontSize="7.5"
-                  fill="#C8102E"
-                  letterSpacing="0.5"
-                >
-                  IIT-JEE / NEET / Foundation
-                </text>
-              </svg>
-            </div>
+          <Link href="/" className="flex-shrink-0 leading-none">
+            <span className="text-2xl font-extrabold tracking-tight">
+              <span className="text-[#000]">Lakshya</span>
+            </span>
+            <p className="text-[10px] font-semibold text-[#C8102E] tracking-widest uppercase leading-none mt-0.5">
+              IIT-JEE / NEET / Foundation
+            </p>
           </Link>
 
           {/* Desktop nav links */}
