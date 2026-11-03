@@ -200,10 +200,11 @@ const faculty = [
 ];
 
 const stats = [
-  { value: "19+", label: "Years of Excellence" },
-  { value: "50,000+", label: "Students Enrolled" },
-  { value: "1,000+", label: "IIT Selections" },
-  { value: "2,500+", label: "NEET Qualifiers" },
+  { value: "19+", label: "Years of Excellence", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+  { value: "50,000+", label: "Students Enrolled", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+  { value: "1,000+", label: "IIT Selections", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
+  { value: "2,500+", label: "NEET Qualifiers", icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
+  { value: "5+", label: "City Branches", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
 
 /* ─── Star Rating ────────────────────────────────────────────── */
@@ -235,21 +236,7 @@ export default function Home() {
         {/* ── 1. HERO BANNER CAROUSEL ─────────────────────── */}
         <HeroBanner />
 
-        {/* ── 2. STATS STRIP ──────────────────────────────────── */}
-        <section className="bg-gradient-to-r from-[#C8102E] to-red-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/20">
-              {stats.map(({ value, label }, i) => (
-                <div key={label} className="flex flex-col items-center justify-center py-6 px-4 gap-1 relative group hover:bg-white/10 transition-colors">
-                  <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{value}</p>
-                  <p className="text-xs sm:text-sm text-red-100 font-medium text-center">{label}</p>
-                  {/* bottom accent line on hover */}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#F5C518] group-hover:w-2/3 transition-all duration-300 rounded-full" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* ── 2. STATS — moved to after Why Choose Us ──────── */}
 
         {/* ── 3. BROWSE BY CATEGORY ───────────────────────────── */}
         <section id="about" className="py-20 bg-white">
@@ -493,6 +480,41 @@ export default function Home() {
                       {exp} Experience
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 7.5. STATS ──────────────────────────────────────── */}
+        <section className="py-16 bg-[#1a1a2e] relative overflow-hidden">
+          {/* Decorative blobs */}
+          <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#C8102E]/10 -translate-x-1/2 -translate-y-1/2 blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-[#F5C518]/5 translate-x-1/2 translate-y-1/2 blur-3xl" />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Heading */}
+            <div className="text-center mb-10">
+              <p className="text-[#F5C518] font-semibold text-sm uppercase tracking-widest mb-2">By the Numbers</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                Lakshya's Impact Across India
+              </h2>
+            </div>
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {stats.map(({ value, label, icon }) => (
+                <div
+                  key={label}
+                  className="group flex flex-col items-center text-center bg-white/5 border border-white/10 rounded-2xl px-4 py-7 hover:bg-white/10 hover:border-[#C8102E]/50 transition-all duration-300"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-[#C8102E]/20 group-hover:bg-[#C8102E] flex items-center justify-center mb-4 transition-colors">
+                    <svg className="w-5 h-5 text-[#C8102E] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+                    </svg>
+                  </div>
+                  <p className="text-3xl font-extrabold text-[#F5C518] leading-none">{value}</p>
+                  <p className="text-xs text-gray-400 mt-2 font-medium leading-tight">{label}</p>
                 </div>
               ))}
             </div>
