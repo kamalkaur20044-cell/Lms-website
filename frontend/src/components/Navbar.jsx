@@ -50,15 +50,9 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-semibold text-[#C8102E] border-2 border-[#C8102E] rounded-full hover:bg-[#C8102E] hover:text-white transition-all duration-200"
+              className="px-5 py-2.5 text-sm font-bold text-white bg-[#C8102E] rounded-full hover:bg-[#a50d25] transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Login
-            </Link>
-            <Link
-              href="/login"
-              className="px-5 py-2 text-sm font-semibold text-white bg-[#C8102E] rounded-full hover:bg-[#a50d25] transition-all duration-200 shadow-md"
-            >
-              Enroll Now
             </Link>
           </div>
 
@@ -107,20 +101,13 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <div className="flex flex-col gap-2 px-4 pt-3 border-t border-gray-100">
+            <div className="px-4 pt-3 border-t border-gray-100">
               <Link
                 href="/login"
-                className="text-center py-2 text-sm font-semibold text-[#C8102E] border-2 border-[#C8102E] rounded-full hover:bg-[#C8102E] hover:text-white transition-all"
+                className="block text-center py-2.5 text-sm font-bold text-white bg-[#C8102E] rounded-full hover:bg-[#a50d25] transition-all"
                 onClick={() => setMenuOpen(false)}
               >
                 Login
-              </Link>
-              <Link
-                href="/login"
-                className="text-center py-2 text-sm font-semibold text-white bg-[#C8102E] rounded-full hover:bg-[#a50d25] transition-all"
-                onClick={() => setMenuOpen(false)}
-              >
-                Enroll Now
               </Link>
             </div>
           </div>

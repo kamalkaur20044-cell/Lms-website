@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = [
   {
@@ -39,10 +40,21 @@ const navItems = [
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const handleLogout = () => {
+    // Clear auth data
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    
+    // Redirect to login
+    router.push("/login");
+  };
+
   return (
-    <div className="min-h-screen bg-[#f7f8fc] flex">
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <div className="min-h-screen bg-[#f7f8fc] flex">
 
       {/* ── Sidebar ──────────────────────────────────── */}
       {/* Mobile overlay */}
@@ -114,6 +126,15 @@ export default function AdminLayout({ children }) {
             </svg>
             Back to Website
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
             <div className="w-8 h-8 rounded-full bg-[#C8102E] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               A
@@ -159,6 +180,18 @@ export default function AdminLayout({ children }) {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C8102E] rounded-full" />
               </button>
 
+              {/* Logout button */}
+              <button 
+                onClick={handleLogout}
+                className="p-2 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors" 
+                aria-label="Logout"
+                title="Logout"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+
               {/* Avatar */}
               <div className="w-8 h-8 rounded-full bg-[#C8102E] flex items-center justify-center text-white text-xs font-bold">
                 A
@@ -172,6 +205,7 @@ export default function AdminLayout({ children }) {
           {children}
         </main>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
