@@ -9,19 +9,19 @@ const stats = [
   { label: "Staff Members", value: "8", change: "No change", up: null, color: "bg-[#1a1a2e]", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
 
-const recentEnquiries = [
-  { name: "Rohit Sharma", phone: "+91 98765 43210", program: "IIT-JEE Mains", date: "Nov 11, 2026", status: "New" },
-  { name: "Priya Singh", phone: "+91 87654 32109", program: "NEET (UG)", date: "Nov 11, 2026", status: "Contacted" },
-  { name: "Amit Verma", phone: "+91 76543 21098", program: "Foundation", date: "Nov 10, 2026", status: "New" },
-  { name: "Sneha Patel", phone: "+91 65432 10987", program: "IIT-JEE Advanced", date: "Nov 10, 2026", status: "Resolved" },
-  { name: "Rahul Gupta", phone: "+91 54321 09876", program: "Crash Course", date: "Nov 09, 2026", status: "Contacted" },
-];
-
 const recentStudents = [
   { name: "Arjun Mehta", course: "IIT-JEE Mains", joined: "Nov 10, 2026", status: "Active" },
   { name: "Kavita Rao", course: "NEET (UG)", joined: "Nov 09, 2026", status: "Active" },
   { name: "Dev Kumar", course: "Foundation", joined: "Nov 08, 2026", status: "Active" },
   { name: "Meera Joshi", course: "IIT-JEE Advanced", joined: "Nov 07, 2026", status: "Inactive" },
+];
+
+const recentCourses = [
+  { name: "IIT-JEE Mains Complete", duration: "12 Months", students: 245, status: "Active" },
+  { name: "NEET (UG) Target Batch", duration: "12 Months", students: 189, status: "Active" },
+  { name: "Foundation Program", duration: "10 Months", students: 156, status: "Active" },
+  { name: "JEE Crash Course", duration: "2 Months", students: 87, status: "Active" },
+  { name: "NEET Online Self-Paced", duration: "Lifetime", students: 342, status: "Inactive" },
 ];
 
 const quickLinks = [
@@ -32,9 +32,6 @@ const quickLinks = [
 ];
 
 const statusColor = {
-  New: "bg-blue-100 text-blue-700",
-  Contacted: "bg-yellow-100 text-yellow-700",
-  Resolved: "bg-green-100 text-green-700",
   Active: "bg-green-100 text-green-700",
   Inactive: "bg-gray-100 text-gray-500",
 };
@@ -100,30 +97,6 @@ export default function AdminDashboard() {
       {/* Tables row */}
       <div className="grid lg:grid-cols-2 gap-6">
 
-        {/* Recent Enquiries */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h2 className="font-bold text-[#1a1a2e] text-sm">Recent Enquiries</h2>
-            <Link href="/admin/enquiries" className="text-xs text-[#C8102E] font-semibold hover:underline">View all</Link>
-          </div>
-          <div className="divide-y divide-gray-50">
-            {recentEnquiries.map((e) => (
-              <div key={e.name} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-[#C8102E]/10 flex items-center justify-center text-xs font-bold text-[#C8102E] flex-shrink-0">
-                  {e.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1a1a2e] truncate">{e.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{e.program} · {e.date}</p>
-                </div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${statusColor[e.status]}`}>
-                  {e.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Recent Students */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -142,6 +115,32 @@ export default function AdminDashboard() {
                 </div>
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${statusColor[s.status]}`}>
                   {s.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Courses */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h2 className="font-bold text-[#1a1a2e] text-sm">Popular Courses</h2>
+            <Link href="/admin/courses" className="text-xs text-[#C8102E] font-semibold hover:underline">View all</Link>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {recentCourses.map((c) => (
+              <div key={c.name} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-[#C8102E]/10 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-[#C8102E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#1a1a2e] truncate">{c.name}</p>
+                  <p className="text-xs text-gray-400 truncate">{c.students} students · {c.duration}</p>
+                </div>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${statusColor[c.status]}`}>
+                  {c.status}
                 </span>
               </div>
             ))}

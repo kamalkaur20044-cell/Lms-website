@@ -9,7 +9,7 @@ const categories = [
   {
     icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z",
     title: "IIT-JEE Mains",
-    count: "2800+ Students",
+    count: "2000+ Students",
     color: "bg-red-50",
     iconBg: "bg-[#C8102E]",
   },
@@ -226,7 +226,7 @@ function StarRating({ rating }) {
   );
 }
 
-/* ─── Page ───────────────────────────────────────────────────── */
+/* ─── Page ───── */
 export default function Home() {
   return (
     <>
@@ -235,8 +235,6 @@ export default function Home() {
       <main>
         {/* ── 1. HERO BANNER CAROUSEL ─────────────────────── */}
         <HeroBanner />
-
-        {/* ── 2. STATS — moved to after Why Choose Us ──────── */}
 
         {/* ── 3. BROWSE BY CATEGORY ───────────────────────────── */}
         <section id="about" className="py-20 bg-white">
@@ -622,10 +620,10 @@ export default function Home() {
             {/* Trust badges */}
             <div className="flex flex-wrap justify-center gap-6 mt-10">
               {[
-                "🎓 1000+ IIT Selections",
-                "🏥 2500+ NEET Qualifiers",
-                "⭐ 4.9/5 Student Rating",
-                "📚 19 Years of Excellence",
+                " 1000+ IIT Selections",
+                " 2500+ NEET Qualifiers",
+                " 4.9/5 Student Rating",
+                "19 Years of Excellence",
               ].map((badge) => (
                 <span key={badge} className="text-sm text-white/80 font-medium">
                   {badge}
