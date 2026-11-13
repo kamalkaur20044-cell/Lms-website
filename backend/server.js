@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['https://lms-website-beta-fawn.vercel.app',  'http://localhost:3000'],
+    origin:process.env.CORS_ORIGIN,
     credentials: true
 }));
 app.use(express.json());
