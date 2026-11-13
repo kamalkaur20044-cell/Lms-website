@@ -7,6 +7,7 @@ import studentRoutes from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import studentPortalRoutes from "./routes/studentPortalRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -15,8 +16,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: 'https://lms-website-beta-fawn.vercel.app',
-    credentials: true
+     origin: (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean),
+     credentials: true
 }));
 app.use(express.json());
 
@@ -26,6 +27,7 @@ app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/student-portal", studentPortalRoutes);
 
 app.get("/", (req, res) => {
     res.send("Lakshya LMS Backend is running!");

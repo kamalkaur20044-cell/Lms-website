@@ -142,3 +142,14 @@ export const courseAPI = {
     return res.json();
   }
 };
+
+export const studentPortalAPI = {
+  getProfile: async () => {
+    const res = await fetch(`${API_BASE}/student-portal/profile`, { headers: getAuthHeaders() });
+    return res.json();
+  },
+  getCourses: async () => {
+    const res = await fetch(`${API_BASE}/student-portal/courses`, { headers: getAuthHeaders() });
+    return res.json();
+  }
+};
