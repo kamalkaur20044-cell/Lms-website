@@ -49,17 +49,30 @@ export const updateCourse = async (req, res) => {
 };
 
 export const deleteCourse = async (req, res) => {
+  const connection = await db.getConnection();
   try {
+    await connection.beginTransaction();
+
     const { id } = req.params;
 
-    const [rows] = await db.query('SELECT id FROM courses WHERE id = ?', [id]);
+    const [rows] = await connection.query('SELECT id FROM courses WHERE id = ?', [id]);
     if (rows.length === 0) {
+      await connection.rollback();
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
 
-    await db.query('DELETE FROM courses WHERE id = ?', [id]);
+    // Delete dependent batches first (FK constraint)
+    await connection.query('DELETE FROM batches WHERE course_id = ?', [id]);
+
+    // Now delete the course
+    await connection.query('DELETE FROM courses WHERE id = ?', [id]);
+
+    await connection.commit();
     res.status(200).json({ success: true, message: 'Course deleted successfully' });
   } catch (error) {
+    await connection.rollback();
     res.status(500).json({ success: false, message: error.message });
+  } finally {
+    connection.release();
   }
 };

@@ -1,24 +1,21 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroBanner from "@/components/HeroBanner";
+import { courseAPI } from "@/services/api";
 
 /* ─── Data ────────────────────────────────────────────────────── */
 
 const categories = [
   {
     icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z",
-    title: "IIT-JEE Mains",
+    title: "IIT-JEE ",
     count: "2000+ Students",
     color: "bg-red-50",
     iconBg: "bg-[#C8102E]",
-  },
-  {
-    icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z",
-    title: "IIT-JEE Advanced",
-    count: "1500+ Students",
-    color: "bg-yellow-50",
-    iconBg: "bg-[#F5C518]",
   },
   {
     icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z",
@@ -36,100 +33,21 @@ const categories = [
   },
   {
     icon: "M13 10V3L4 14h7v7l9-11h-7z",
-    title: "Crash Courses",
+    title: "Olympiad",
     count: "900+ Students",
     color: "bg-purple-50",
     iconBg: "bg-purple-500",
   },
   {
     icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2",
-    title: "Online Batches",
+    title: "Ncert",
     count: "1200+ Students",
     color: "bg-orange-50",
     iconBg: "bg-orange-500",
   },
 ];
 
-const courses = [
-  {
-    badge: "Most Popular",
-    badgeColor: "bg-[#C8102E]",
-    title: "IIT-JEE Mains Complete Course",
-    desc: "Comprehensive Physics, Chemistry & Maths coverage with 500+ hours of live classes, DPPs, and full test series.",
-    duration: "12 Months",
-    students: "2,840",
-    rating: 4.9,
-    category: "IIT-JEE",
-    tagColor: "bg-red-100 text-[#C8102E]",
-    icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z",
-    iconBg: "from-red-400 to-[#C8102E]",
-  },
-  {
-    badge: "Top Rated",
-    badgeColor: "bg-[#F5C518] text-[#1a1a2e]",
-    title: "IIT-JEE Advanced Intensive",
-    desc: "Advanced problem-solving, past 20-year paper analysis, and mentoring from IITians for Rank < 500.",
-    duration: "8 Months",
-    students: "1,520",
-    rating: 4.8,
-    category: "IIT-JEE Advanced",
-    tagColor: "bg-yellow-100 text-yellow-700",
-    icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z",
-    iconBg: "from-yellow-400 to-yellow-600",
-  },
-  {
-    badge: "High Demand",
-    badgeColor: "bg-green-500",
-    title: "NEET (UG) Target Batch",
-    desc: "Biology, Physics & Chemistry for NEET with NCERT-focused strategy, MCQ banks & weekly mock exams.",
-    duration: "12 Months",
-    students: "3,210",
-    rating: 4.9,
-    category: "NEET",
-    tagColor: "bg-green-100 text-green-700",
-    icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z",
-    iconBg: "from-green-400 to-green-600",
-  },
-  {
-    badge: "New Batch",
-    badgeColor: "bg-blue-500",
-    title: "Foundation Program (Class VIII–X)",
-    desc: "Build strong Maths & Science fundamentals for competitive exams. Includes Olympiad & NTSE prep.",
-    duration: "10 Months",
-    students: "4,120",
-    rating: 4.7,
-    category: "Foundation",
-    tagColor: "bg-blue-100 text-blue-700",
-    icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-    iconBg: "from-blue-400 to-blue-600",
-  },
-  {
-    badge: "Fast Track",
-    badgeColor: "bg-purple-500",
-    title: "JEE Crash Course (60 Days)",
-    desc: "Rapid revision of high-weightage topics, 30 full-length mocks, and daily doubt clearing sessions.",
-    duration: "2 Months",
-    students: "980",
-    rating: 4.6,
-    category: "Crash Course",
-    tagColor: "bg-purple-100 text-purple-700",
-    icon: "M13 10V3L4 14h7v7l9-11h-7z",
-    iconBg: "from-purple-400 to-purple-600",
-  },
-  {
-    badge: "Flexible",
-    badgeColor: "bg-orange-500",
-    title: "NEET Online Self-Paced Batch",
-    desc: "Study at your own pace with 800+ recorded lectures, unlimited test attempts, and live doubt sessions.",
-    duration: "Lifetime Access",
-    students: "1,250",
-    rating: 4.7,
-    category: "Online",
-    tagColor: "bg-orange-100 text-orange-700",
-    icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2",
-    iconBg: "from-orange-400 to-orange-600",
-  },
-];
+const courses = [];
 
 const whyUs = [
   {
@@ -228,6 +146,16 @@ function StarRating({ rating }) {
 
 /* ─── Page ───── */
 export default function Home() {
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+
+  useEffect(() => {
+    courseAPI.getPublic()
+      .then((data) => { if (data.success) setCourses(data.data.filter((c) => c.status === "active")); })
+      .catch(() => {})
+      .finally(() => setCoursesLoading(false));
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -251,7 +179,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
               {categories.map(({ icon, title, count, color, iconBg }) => (
                 <Link
                   href="#courses"
@@ -335,59 +263,71 @@ export default function Home() {
               </p>
             </div>
 
+            {coursesLoading ? (
+              <div className="text-center py-16">
+                <div className="w-10 h-10 border-4 border-[#C8102E] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-gray-400 text-sm">Loading courses...</p>
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="text-center py-16">
+                <svg className="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <p className="text-gray-400 text-sm font-medium">No courses available yet.</p>
+                <p className="text-gray-300 text-xs mt-1">Check back soon or contact us for more info.</p>
+              </div>
+            ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((c) => (
-                <article
-                  key={c.title}
-                  className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm card-hover group"
-                >
-                  {/* Card header */}
-                  <div className={`h-40 bg-gradient-to-br ${c.iconBg} flex items-center justify-center relative overflow-hidden`}>
+              {courses.slice(0, 6).map((c, i) => {
+                const gradients = ["from-red-400 to-[#C8102E]", "from-green-400 to-green-600", "from-blue-400 to-blue-600", "from-purple-400 to-purple-600", "from-teal-400 to-teal-600", "from-orange-400 to-orange-600"];
+                const bookIcon = "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253";
+                return (
+                <article key={c.id}
+                  className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm card-hover group">
+                  <div className={`h-40 bg-gradient-to-br ${gradients[i % gradients.length]} flex items-center justify-center relative overflow-hidden`}>
                     <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-white/10 translate-x-8 -translate-y-8" />
                     <svg className="w-16 h-16 text-white opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d={c.icon} />
+                      <path strokeLinecap="round" strokeLinejoin="round" d={bookIcon} />
                     </svg>
-                    <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full text-white ${c.badgeColor}`}>
-                      {c.badge}
+                    <span className="absolute top-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full bg-white/20 text-white backdrop-blur-sm">
+                      Active
                     </span>
-                  </div>
-
-                  <div className="p-5">
-                    <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${c.tagColor} mb-2`}>
-                      {c.category}
-                    </span>
-                    <h3 className="font-bold text-[#1a1a2e] text-base leading-snug mb-1 group-hover:text-[#C8102E] transition-colors">
-                      {c.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed mb-3">{c.desc}</p>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <StarRating rating={c.rating} />
-                      <span className="text-xs text-gray-500">{c.students} students</span>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    {c.duration && (
+                      <span className="absolute bottom-3 right-3 px-2.5 py-1 text-xs font-semibold bg-black/30 text-white rounded-full backdrop-blur-sm">
                         {c.duration}
-                      </div>
-                      <Link
-                        href="/login"
-                        className="px-4 py-1.5 bg-[#C8102E] text-white text-xs font-bold rounded-full hover:bg-[#a50d25] transition-colors"
-                      >
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-[#1a1a2e] text-base leading-snug mb-1 group-hover:text-[#C8102E] transition-colors">
+                      {c.course_name}
+                    </h3>
+                    {c.description && (
+                      <p className="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-2">{c.description}</p>
+                    )}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      {c.duration && (
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {c.duration}
+                        </div>
+                      )}
+                      <Link href="/contact"
+                        className="px-4 py-1.5 bg-[#C8102E] text-white text-xs font-bold rounded-full hover:bg-[#a50d25] transition-colors">
                         Enroll Now
                       </Link>
                     </div>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
-
+            )}
             <div className="text-center mt-10">
               <Link
-                href="#"
+                href="/courses"
                 className="inline-flex items-center gap-2 px-7 py-3 border-2 border-[#C8102E] text-[#C8102E] font-bold rounded-full hover:bg-[#C8102E] hover:text-white transition-all duration-200"
               >
                 View All Courses

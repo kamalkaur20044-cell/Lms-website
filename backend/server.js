@@ -16,8 +16,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-     origin: (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean),
-     credentials: true
+    origin: (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean),
+    credentials: true
 }));
 app.use(express.json());
 

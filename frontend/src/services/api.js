@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -117,6 +117,10 @@ export const staffAPI = {
 };
 
 export const courseAPI = {
+  getPublic: async () => {
+    const res = await fetch(`${API_BASE}/courses/public`);
+    return res.json();
+  },
   getAll: async () => {
     const res = await fetch(`${API_BASE}/courses`, { headers: getAuthHeaders() });
     return res.json();

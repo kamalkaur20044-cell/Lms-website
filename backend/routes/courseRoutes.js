@@ -5,6 +5,10 @@ import { roleMiddleware } from '../middleware/roleMiddleware.js';
 
 const router = express.Router();
 
+// Public route — no auth needed
+router.get('/public', getCourses);
+
+// Protected routes — admin only
 router.use(authMiddleware);
 router.use(roleMiddleware('admin'));
 

@@ -14,8 +14,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-console.log(process.env.DB_NAME)
-
 export const connectDB = async () => {
     try {
         const connection = await pool.getConnection();
