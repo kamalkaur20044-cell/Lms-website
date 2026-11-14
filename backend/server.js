@@ -1,10 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js";
+import authRoutes    from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
+import staffRoutes   from "./routes/staffRoutes.js";
+import courseRoutes  from "./routes/courseRoutes.js";
+import galleryRoutes from "./routes/galleryRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import studentPortalRoutes from "./routes/studentPortalRoutes.js";
@@ -12,21 +17,27 @@ import studentPortalRoutes from "./routes/studentPortalRoutes.js";
 dotenv.config();
 connectDB();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+
 const app = express();
 
-// Middleware
 app.use(cors({
     origin: (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean),
     credentials: true
 }));
 app.use(express.json());
 
-// Routes
-app.use("/api/auth", authRoutes);
+// Serve uploaded images statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// API Routes
+app.use("/api/auth",    authRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);
-app.use("/api/staff", staffRoutes);
+app.use("/api/staff",   staffRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/gallery", galleryRoutes);
 app.use("/api/student-portal", studentPortalRoutes);
 
 app.get("/", (req, res) => {
@@ -37,4 +48,3 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
