@@ -10,8 +10,6 @@ import teacherRoutes from "./routes/teacherRoutes.js";
 import staffRoutes   from "./routes/staffRoutes.js";
 import courseRoutes  from "./routes/courseRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
-import staffRoutes from "./routes/staffRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js";
 import studentPortalRoutes from "./routes/studentPortalRoutes.js";
 
 dotenv.config();
