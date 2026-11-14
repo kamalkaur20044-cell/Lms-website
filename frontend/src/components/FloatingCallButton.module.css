@@ -1,0 +1,75 @@
+/* ── FloatingCallButton.module.css ───────────────────────────────
+   Scoped styles — keyframes must live outside @media blocks.
+──────────────────────────────────────────────────────────────── */
+
+.callFloat {
+  position: fixed;
+  bottom: 28px;
+  left: 24px;
+  z-index: 999;
+  width: 52px;
+  height: 52px;
+  background: #C8102E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(200, 16, 46, 0.45);
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.callFloat:hover,
+.callFloat:active {
+  transform: scale(1.1);
+  box-shadow: 0 10px 28px rgba(200, 16, 46, 0.6);
+}
+
+/* Tooltip above the button */
+.tooltip {
+  position: absolute;
+  bottom: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: #1a1a2e;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1a1a2e;
+}
+
+.callFloat:hover .tooltip,
+.callFloat:active .tooltip {
+  opacity: 1;
+}
+
+/* Pulse ring */
+.pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(200, 16, 46, 0.35);
+  animation: callPulse 2s ease-out infinite;
+}
+
+/* Keyframes MUST be outside @media */
+@keyframes callPulse {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  70%  { transform: scale(1.65); opacity: 0;   }
+  100% { transform: scale(1.65); opacity: 0;   }
+}

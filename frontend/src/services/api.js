@@ -145,4 +145,31 @@ export const courseAPI = {
     const res = await fetch(`${API_BASE}/courses/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     return res.json();
   }
+}
+console.log(API_BASE)
+export const galleryAPI = {
+  
+  // Public 
+  getAll: async () => {
+    const res = await fetch(`${API_BASE}/gallery`);
+    return res.json();
+  },
+
+  upload: async (formData) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const res = await fetch(`${API_BASE}/gallery`, {
+      method: 'POST',
+      headers: { ...(token && { 'Authorization': `Bearer ${token}` }) },
+      body: formData,
+    });
+    return res.json();
+  },
+  // Admin — delete by id
+  delete: async (id) => {
+    const res = await fetch(`${API_BASE}/gallery/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return res.json();
+  },
 };
