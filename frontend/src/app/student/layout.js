@@ -51,61 +51,63 @@ export default function StudentLayout({ children }) {
         )}
 
         <aside
-          className={`fixed top-0 left-0 h-screen w-64 bg-[#1a1a2e] z-30 flex flex-col transition-transform duration-300
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen`}
+          className={`fixed top-0 left-0 h-screen w-64 flex-shrink-0 bg-[#1a1a2e] z-30 transition-transform duration-300
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:h-auto`}
         >
-          <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-            <div className="w-9 h-9 rounded-xl bg-[#C8102E] flex items-center justify-center flex-shrink-0 text-white">
-              <Icon d={icons.cap} strokeWidth={2} />
-            </div>
-            <div>
-              <p className="text-white font-bold text-sm leading-tight">Lakshya Student</p>
-              <p className="text-gray-400 text-xs">Student Portal</p>
-            </div>
-          </div>
-
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest px-3 mb-3">Main Menu</p>
-            {navItems.map(({ label, href, icon }) => {
-              const active = pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative
-                    ${active ? "bg-[#C8102E] text-white shadow-md shadow-red-900/30" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}
-                >
-                  <Icon d={icon} className="w-5 h-5 flex-shrink-0" />
-                  <span>{label}</span>
-                  {active && <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F5C518] rounded-l-full" />}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="px-3 py-4 border-t border-white/10 space-y-2">
-            <Link
-              href="/"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all"
-            >
-              <Icon d={icons.back} />
-              Back to Website
-            </Link>
-            <button
-              onClick={logout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
-            >
-              <Icon d={icons.logout} />
-              Logout
-            </button>
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
-              <div className="w-8 h-8 rounded-full bg-[#C8102E] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {initial}
+          <div className="h-full lg:h-screen lg:sticky lg:top-0 flex flex-col overflow-y-auto">
+            <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+              <div className="w-9 h-9 rounded-xl bg-[#C8102E] flex items-center justify-center flex-shrink-0 text-white">
+                <Icon d={icons.cap} strokeWidth={2} />
               </div>
-              <div className="min-w-0">
-                <p className="text-white text-xs font-semibold truncate">{username || "Student"}</p>
-                <p className="text-gray-500 text-xs truncate">Student</p>
+              <div>
+                <p className="text-white font-bold text-sm leading-tight">Lakshya Student</p>
+                <p className="text-gray-400 text-xs">Student Portal</p>
+              </div>
+            </div>
+
+            <nav className="flex-1 px-3 py-4 space-y-1">
+              <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest px-3 mb-3">Main Menu</p>
+              {navItems.map(({ label, href, icon }) => {
+                const active = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative
+                      ${active ? "bg-[#C8102E] text-white shadow-md shadow-red-900/30" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}
+                  >
+                    <Icon d={icon} className="w-5 h-5 flex-shrink-0" />
+                    <span>{label}</span>
+                    {active && <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F5C518] rounded-l-full" />}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="px-3 py-4 border-t border-white/10 space-y-2">
+              <Link
+                href="/"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+              >
+                <Icon d={icons.back} />
+                Back to Website
+              </Link>
+              <button
+                onClick={logout}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
+              >
+                <Icon d={icons.logout} />
+                Logout
+              </button>
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
+                <div className="w-8 h-8 rounded-full bg-[#C8102E] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  {initial}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-xs font-semibold truncate">{username || "Student"}</p>
+                  <p className="text-gray-500 text-xs truncate">Student</p>
+                </div>
               </div>
             </div>
           </div>
