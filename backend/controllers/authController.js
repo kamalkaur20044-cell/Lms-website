@@ -31,15 +31,17 @@ export const login = async (req, res) => {
     const user = users[0];
     
     // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+    // PHP's password_hash() creates "$2y$" hashes; node bcrypt only accepts "$2a$"/"$2b$"
+    const storedHash = String(user.password).replace(/^\$2y\$/, '$2b$');
+    const isPasswordValid = await bcrypt.compare(password, storedHash);
+
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
-    
+
     // Generate JWT token
     const token = jwt.sign(
       { 
@@ -174,7 +176,10 @@ export const changePassword = async (req, res) => {
     }
     
     // Verify current password
-    const isPasswordValid = await bcrypt.compare(currentPassword, users[0].password);
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      String(users[0].password).replace(/^\$2y\$/, '$2b$')
+    );
     
     if (!isPasswordValid) {
       return res.status(401).json({

@@ -10,6 +10,9 @@ import teacherRoutes from "./routes/teacherRoutes.js";
 import staffRoutes   from "./routes/staffRoutes.js";
 import courseRoutes  from "./routes/courseRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
+import staffRoutes from "./routes/staffRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
+import studentPortalRoutes from "./routes/studentPortalRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -35,6 +38,7 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/staff",   staffRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/gallery", galleryRoutes);
+app.use("/api/student-portal", studentPortalRoutes);
 
 app.get("/", (req, res) => {
     res.send("Lakshya LMS Backend is running!");
