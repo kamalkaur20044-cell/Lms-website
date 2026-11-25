@@ -9,7 +9,7 @@ const statusColor = {
 };
 
 const emptyForm = {
-  course_name: "", description: "", duration: "", status: "active",
+  course_name: "", description: "", duration: "", fee: "", discount_percent: "0", status: "active",
 };
 
 export default function CoursesPage() {
@@ -20,6 +20,7 @@ export default function CoursesPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
 
@@ -46,6 +47,12 @@ export default function CoursesPage() {
   const validate = () => {
     const e = {};
     if (!form.course_name.trim()) e.course_name = "Required";
+    const fee = Number(form.fee);
+    if (form.fee === "" || !Number.isFinite(fee) || fee < 0) e.fee = "Enter a valid fee";
+    const discountPercent = Number(form.discount_percent);
+    if (form.discount_percent === "" || !Number.isFinite(discountPercent) || discountPercent < 0 || discountPercent > 100) {
+      e.discount_percent = "Enter a discount between 0 and 100";
+    }
     return e;
   };
 
@@ -57,20 +64,63 @@ export default function CoursesPage() {
     setSubmitting(true);
     setApiError("");
     try {
-      const data = await courseAPI.create(form);
+      const wasEditing = Boolean(editingCourse);
+      const data = wasEditing
+        ? await courseAPI.update(editingCourse.id, form)
+        : await courseAPI.create(form);
       if (data.success) {
+        if (wasEditing && data.data) {
+          setCourses((current) => current.map((course) =>
+            String(course.id) === String(data.data.id) ? data.data : course
+          ));
+        } else {
+          fetchCourses();
+        }
         setForm(emptyForm);
         setErrors({});
         setShowModal(false);
-        fetchCourses();
+        setEditingCourse(null);
       } else {
-        setApiError(data.message || "Failed to create course");
+        setApiError(data.message || `Failed to ${wasEditing ? "update" : "create"} course`);
       }
     } catch {
       setApiError("Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openAddCourse = () => {
+    setEditingCourse(null);
+    setForm(emptyForm);
+    setErrors({});
+    setApiError("");
+    setShowModal(true);
+  };
+
+  const openEditCourse = (course) => {
+    setEditingCourse(course);
+    setForm({
+      course_name: course.course_name || "",
+      description: course.description || "",
+      duration: course.duration || "",
+      fee: course.fee === null || course.fee === undefined ? "" : String(course.fee),
+      discount_percent: course.discount_percent === null || course.discount_percent === undefined
+        ? "0"
+        : String(course.discount_percent),
+      status: course.status || "active",
+    });
+    setErrors({});
+    setApiError("");
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingCourse(null);
+    setForm(emptyForm);
+    setErrors({});
+    setApiError("");
   };
 
   const handleDelete = async (id) => {
@@ -101,7 +151,7 @@ export default function CoursesPage() {
           <h1 className="text-xl font-extrabold text-[#1a1a2e]">Courses</h1>
           <p className="text-sm text-gray-500">{filtered.length} of {courses.length} courses</p>
         </div>
-        <button onClick={() => { setShowModal(true); setApiError(""); }} className="flex items-center gap-2 px-4 py-2 bg-[#C8102E] text-white text-sm font-bold rounded-xl hover:bg-[#a50d25] transition-colors self-start sm:self-auto">
+        <button onClick={openAddCourse} className="flex items-center gap-2 px-4 py-2 bg-[#C8102E] text-white text-sm font-bold rounded-xl hover:bg-[#a50d25] transition-colors self-start sm:self-auto">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           Add Course
         </button>
@@ -132,7 +182,7 @@ export default function CoursesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[#f7f8fc] border-b border-gray-100">
-                  {["ID", "Course Name", "Description", "Duration", "Status", "Created At", "Actions"].map((h) => (
+                  {["ID", "Course Name", "Description", "Duration", "Fee", "Discount", "Status", "Created At", "Actions"].map((h) => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -144,14 +194,22 @@ export default function CoursesPage() {
                     <td className="px-4 py-3.5 font-semibold text-[#1a1a2e] max-w-[200px]">{c.course_name}</td>
                     <td className="px-4 py-3.5 text-gray-500 text-xs max-w-[220px] truncate">{c.description}</td>
                     <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">{c.duration}</td>
+                    <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">{c.fee === null || c.fee === undefined ? "—" : `₹${Number(c.fee).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`}</td>
+                    <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">{c.discount_percent === null || c.discount_percent === undefined ? "0%" : `${Number(c.discount_percent)}%`}</td>
                     <td className="px-4 py-3.5">
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${statusColor[c.status]}`}>{c.status}</span>
                     </td>
                     <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">{c.created_at?.split("T")[0]}</td>
                     <td className="px-4 py-3.5">
-                      <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" title="Delete">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => openEditCourse(c)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-50" aria-label={`Edit ${c.course_name}`}>
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                          Edit
+                        </button>
+                        <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" title="Delete">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -169,11 +227,11 @@ export default function CoursesPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={closeModal}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-extrabold text-[#1a1a2e]">Add Course</h2>
-              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
+              <h2 className="text-lg font-extrabold text-[#1a1a2e]">{editingCourse ? "Edit Course" : "Add Course"}</h2>
+              <button onClick={closeModal} className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center" aria-label="Close course form">
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -202,6 +260,22 @@ export default function CoursesPage() {
                   onChange={(e) => setForm((p) => ({ ...p, duration: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/10" />
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Course Fee (₹) <span className="text-[#C8102E]">*</span></label>
+                  <input type="number" min="0" step="0.01" placeholder="Enter course fee" value={form.fee}
+                    onChange={(e) => { setForm((p) => ({ ...p, fee: e.target.value })); setErrors((p) => ({ ...p, fee: "" })); }}
+                    className={`w-full px-3 py-2 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C8102E]/10 ${errors.fee ? "border-red-400" : "border-gray-200 focus:border-[#C8102E]"}`} />
+                  {errors.fee && <p className="text-xs text-red-500 mt-0.5">{errors.fee}</p>}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Discount (%)</label>
+                  <input type="number" min="0" max="100" step="0.01" placeholder="0" value={form.discount_percent}
+                    onChange={(e) => { setForm((p) => ({ ...p, discount_percent: e.target.value })); setErrors((p) => ({ ...p, discount_percent: "" })); }}
+                    className={`w-full px-3 py-2 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C8102E]/10 ${errors.discount_percent ? "border-red-400" : "border-gray-200 focus:border-[#C8102E]"}`} />
+                  {errors.discount_percent && <p className="text-xs text-red-500 mt-0.5">{errors.discount_percent}</p>}
+                </div>
+              </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Status</label>
                 <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
@@ -211,11 +285,11 @@ export default function CoursesPage() {
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)}
+                <button type="button" onClick={closeModal}
                   className="flex-1 py-2.5 border border-gray-200 text-sm font-semibold text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
                 <button type="submit" disabled={submitting}
                   className="flex-1 py-2.5 bg-[#C8102E] text-white text-sm font-bold rounded-xl hover:bg-[#a50d25] transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                  {submitting ? "Saving..." : "Add Course"}
+                  {submitting ? "Saving..." : editingCourse ? "Save Changes" : "Add Course"}
                 </button>
               </div>
             </form>

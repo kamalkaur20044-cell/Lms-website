@@ -7,7 +7,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroBanner from "@/components/HeroBanner";
 import CourseCard from "@/components/CourseCard";
-import { fallbackCourses } from "@/data/publicCourses";
 import { courseAPI, teacherAPI } from "@/services/api";
 
 /* ─── Data ────────────────────────────────────────────────────── */
@@ -214,9 +213,9 @@ export default function Home() {
         const activeCourses = data.success && Array.isArray(data.data)
           ? data.data.filter((course) => course.status === "active")
           : [];
-        setCourses(activeCourses.length > 0 ? activeCourses : fallbackCourses);
+        setCourses(activeCourses);
       })
-      .catch(() => setCourses(fallbackCourses))
+      .catch(() => setCourses([]))
       .finally(() => setCoursesLoading(false));
   }, []);
 

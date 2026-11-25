@@ -8,18 +8,19 @@ import { icons } from "../icons";
 import { Card, Field, PageTitle } from "../ui";
 import { formatDate, formatTime, fullName } from "../utils";
 
-export default function MyCourses() {
+export default function MyCourses({ studentId: studentIdProp } = {}) {
   const [courses, setCourses] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const studentId = studentIdProp || new URLSearchParams(window.location.search).get("studentId");
     studentPortalAPI
-      .getCourses()
+      .getCourses(studentId)
       .then((res) => (res.success ? setCourses(res.data) : setError(res.message || "Could not load courses")))
       .catch(() => setError("Network error. Please try again."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [studentIdProp]);
 
   return (
     <div className="space-y-6">

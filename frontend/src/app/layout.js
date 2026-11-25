@@ -19,6 +19,9 @@ export const viewport = {
 
 export const metadata = {
   title: "Lakshya — IIT-JEE | NEET | Foundation",
+    icons: {
+    icon: "/favicon.ico",
+  },
   description:
     "Lakshya is India's premier coaching institute for IIT-JEE, NEET, and Foundation courses. Expert faculty, proven results, and a student-first approach.",
   keywords: "IIT JEE coaching, NEET preparation, Foundation courses, Lakshya, competitive exam",

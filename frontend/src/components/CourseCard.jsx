@@ -1,7 +1,11 @@
 import Link from "next/link";
 
-const originalFee = "₹52,500";
-const discountedFee = "₹44,625";
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
+const percentFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
 
 function getCourseDetails(course) {
   const name = course.course_name?.toLowerCase() || "";
@@ -48,48 +52,77 @@ function getCourseDetails(course) {
 
 export default function CourseCard({ course }) {
   const details = getCourseDetails(course);
+  const fee = course.fee === null || course.fee === undefined || course.fee === "" ? null : Number(course.fee);
+  const discountPercent = course.discount_percent === null || course.discount_percent === undefined
+    ? 0
+    : Number(course.discount_percent);
+  const hasFee = fee !== null && Number.isFinite(fee) && fee >= 0;
+  const hasDiscount = hasFee && Number.isFinite(discountPercent) && discountPercent > 0 && discountPercent <= 100;
+  const discountedFee = hasFee ? fee * (1 - (hasDiscount ? discountPercent : 0) / 100) : null;
+  const savings = hasDiscount ? fee - discountedFee : 0;
 
   return (
-    <article className="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-[#C8102E]/25 hover:shadow-lg">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <span className="rounded-full bg-[#1a1a2e] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-          Active course
-        </span>
-        <span className="rounded-full bg-red-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[#C8102E]">
-          Early bird · 15% off
-        </span>
-      </div>
-
-      <h2 className="text-lg font-extrabold leading-snug text-[#1a1a2e]">
-        {course.course_name}
-      </h2>
-      <p className="mt-1 text-sm leading-relaxed text-gray-500">{details.subtitle}</p>
-
-      <ul className="mt-5 space-y-3">
-        {details.highlights.map((highlight) => (
-          <li key={highlight} className="flex items-start gap-2.5 text-sm leading-relaxed text-gray-700">
-            <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#C8102E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            <span>{highlight}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-auto flex items-end justify-between gap-3 border-t border-gray-100 pt-5">
-        <div>
-          <p className="text-xs text-gray-400 line-through">{originalFee}</p>
-          <p className="text-2xl font-black text-[#1a1a2e]">{discountedFee}</p>
+    <article className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-[#C8102E]/25 hover:shadow-xl">
+      <div className="h-1.5 bg-gradient-to-r from-[#C8102E] via-[#F5C518] to-[#1a1a2e]" />
+      <div className="flex flex-1 flex-col p-6">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#1a1a2e] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            Active course
+          </span>
+          {hasDiscount && (
+            <span className="rounded-full bg-[#C8102E] px-3 py-1.5 text-xs font-extrabold tracking-wide text-white shadow-sm shadow-red-900/20">
+              {percentFormatter.format(discountPercent)}% OFF
+            </span>
+          )}
         </div>
-        <Link
-          href={`/courses/${encodeURIComponent(course.id)}`}
-          className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl bg-[#C8102E] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#a50d25]"
-        >
-          Know more
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
+
+        <h2 className="text-lg font-extrabold leading-snug text-[#1a1a2e]">
+          {course.course_name}
+        </h2>
+        <p className="mt-1 text-sm leading-relaxed text-gray-500">{details.subtitle}</p>
+
+        <ul className="mt-5 space-y-3">
+          {details.highlights.map((highlight) => (
+            <li key={highlight} className="flex items-start gap-2.5 text-sm leading-relaxed text-gray-700">
+              <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#C8102E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-auto border-t border-gray-100 pt-5">
+          {hasFee ? (
+            <div className="rounded-2xl border border-[#C8102E]/10 bg-gradient-to-br from-gray-50 to-rose-50/70 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  {hasDiscount && <p className="text-xs text-gray-400 line-through">{currencyFormatter.format(fee)}</p>}
+                  <p className="mt-1 text-2xl font-black tracking-tight text-[#1a1a2e]">{currencyFormatter.format(discountedFee)}</p>
+                  <p className="mt-0.5 text-[11px] font-medium text-gray-500">{hasDiscount ? "Discounted course fee" : "Course fee"}</p>
+                </div>
+                {hasDiscount && (
+                  <span className="shrink-0 rounded-xl bg-white px-3 py-2 text-right shadow-sm">
+                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">You save</span>
+                    <span className="mt-0.5 block text-xs font-extrabold text-[#C8102E]">{currencyFormatter.format(savings)}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm font-bold text-gray-600">Contact for fees</p>
+          )}
+          <Link
+            href={`/courses/${encodeURIComponent(course.id)}`}
+            className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#C8102E] px-4 py-3 text-sm font-bold text-white shadow-sm shadow-red-900/10 transition-all hover:bg-[#a50d25] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] focus-visible:ring-offset-2"
+          >
+            Know more
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </article>
   );

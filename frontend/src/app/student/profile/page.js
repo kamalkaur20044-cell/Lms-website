@@ -14,18 +14,19 @@ const PASSWORD_FIELDS = [
   ["confirmPassword", "Confirm new password"],
 ];
 
-export default function Profile() {
+export default function Profile({ studentId: studentIdProp } = {}) {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const studentId = studentIdProp || new URLSearchParams(window.location.search).get("studentId");
     studentPortalAPI
-      .getProfile()
+      .getProfile(studentId)
       .then((res) => (res.success ? setProfile(res.data) : setError(res.message || "Could not load profile")))
       .catch(() => setError("Network error. Please try again."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [studentIdProp]);
 
   const student = profile?.student;
   const parents = profile?.parents ?? [];

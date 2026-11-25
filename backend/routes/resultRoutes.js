@@ -35,7 +35,7 @@ const upload = multer({
 });
 
 router.get("/", authMiddleware, roleMiddleware("admin", "teacher"), getResults);
-router.get("/mine", authMiddleware, roleMiddleware("student"), getMyResults);
+router.get("/mine", authMiddleware, roleMiddleware("student", "admin"), getMyResults);
 router.post("/upload", authMiddleware, roleMiddleware("admin", "teacher"), upload.single("file"), uploadResults);
 
 export default router;

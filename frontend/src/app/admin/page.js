@@ -15,8 +15,16 @@ const quickLinks = [
   { label: "Add Course", href: "/admin/courses", icon: "M12 4v16m8-8H4", color: "bg-[#C8102E]" },
   { label: "Add Faculty", href: "/admin/faculty", icon: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z", color: "bg-green-500" },
   { label: "Add Staff", href: "/admin/staff", icon: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z", color: "bg-[#1a1a2e]" },
+  { label: "Assign Duties", href: "/admin/duty-schedule", icon: "M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2z", color: "bg-indigo-500" },
   { label: "Upload Gallery", href: "/admin/gallery", icon: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z", color: "bg-indigo-500" },
 ];
+
+const statLinks = {
+  "Total Students": "/admin/students",
+  "Active Courses": "/admin/courses",
+  "Faculty Members": "/admin/faculty",
+  "Staff Members": "/admin/staff",
+};
 
 const statusColor = {
   Active: "bg-green-100 text-green-700",
@@ -150,7 +158,7 @@ export default function AdminDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(({ label, color, icon }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col gap-3">
+          <Link key={label} href={statLinks[label]} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col gap-3 transition-all hover:-translate-y-1 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] focus-visible:ring-offset-2">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</p>
               <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center`}>
@@ -161,7 +169,7 @@ export default function AdminDashboard() {
             </div>
             <p className="text-3xl font-extrabold text-[#1a1a2e]">{statValues[label]}</p>
             <p className="text-xs font-medium text-gray-400">{statDetails[label]}</p>
-          </div>
+          </Link>
         ))}
       </div>
 

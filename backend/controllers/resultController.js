@@ -10,6 +10,16 @@ const getColumn = (row, aliases) => {
     return key ? row[key] : undefined;
 };
 
+const parseOptionalCount = (value, label, invalidFields) => {
+    if (value === null || value === undefined || value === "") return null;
+    const count = Number(value);
+    if (!Number.isSafeInteger(count) || count < 0) {
+        invalidFields.push(`${label} (must be a non-negative whole number)`);
+        return null;
+    }
+    return count;
+};
+
 const toDate = (value) => {
     if (value === null || value === undefined || value === "") return null;
     if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -27,7 +37,8 @@ const getResultRows = async (whereClause, values) => {
                 s.id AS student_id, s.admission_number,
                 CONCAT_WS(' ', s.first_name, s.last_name) AS student_name,
                 sub.subject_name AS subject,
-                r.obtained_marks AS marks, r.max_marks
+               r.obtained_marks AS marks, r.max_marks,
+               r.correct_answers, r.wrong_answers, r.unanswered
          FROM results r
          INNER JOIN exams e ON e.exam_id = r.exam_id
          INNER JOIN subjects sub ON sub.id = r.subject_id
@@ -57,7 +68,14 @@ const getResultRows = async (whereClause, values) => {
         }
         const marks = Number(row.marks);
         const maxMarks = Number(row.max_marks);
-        result.subjects.push({ name: row.subject, marks, max_marks: maxMarks });
+        result.subjects.push({
+            name: row.subject,
+            marks,
+            max_marks: maxMarks,
+            correct_answers: row.correct_answers,
+            wrong_answers: row.wrong_answers,
+            unanswered: row.unanswered,
+        });
         result.total += marks;
         result.max_total += maxMarks;
     }
@@ -81,10 +99,19 @@ export const getResults = async (_req, res) => {
 
 export const getMyResults = async (req, res) => {
     try {
-        const [students] = await db.query(
-            "SELECT id FROM students WHERE user_id = ?",
-            [req.user.user_id]
-        );
+        let students;
+        if (req.user.role === "admin") {
+            const studentId = Number(req.query.studentId);
+            if (!Number.isSafeInteger(studentId) || studentId < 1) {
+                return res.status(400).json({ success: false, message: "A valid studentId is required for admin access" });
+            }
+            [students] = await db.query("SELECT id FROM students WHERE id = ?", [studentId]);
+        } else {
+            [students] = await db.query(
+                "SELECT id FROM students WHERE user_id = ?",
+                [req.user.user_id]
+            );
+        }
         if (students.length === 0) {
             return res.status(404).json({ success: false, message: "Student record not found" });
         }
@@ -124,9 +151,15 @@ export const uploadResults = async (req, res) => {
             const subject = getColumn(row, ["subject", "subjectname"]);
             const rawMarks = getColumn(row, ["marks", "marksobtained"]);
             const rawMaxMarks = getColumn(row, ["maximummarks", "maxmarks", "totalmarks"]);
+            const rawCorrectAnswers = getColumn(row, ["correctanswers", "correct", "rightanswers"]);
+            const rawWrongAnswers = getColumn(row, ["wronganswers", "incorrectanswers", "wrong"]);
+            const rawUnanswered = getColumn(row, ["unanswered", "unansweredquestions", "blankanswers"]);
             const marks = Number(rawMarks);
             const maxMarks = Number(rawMaxMarks);
             const invalidFields = [];
+            const correctAnswers = parseOptionalCount(rawCorrectAnswers, "Correct Answers", invalidFields);
+            const wrongAnswers = parseOptionalCount(rawWrongAnswers, "Wrong Answers", invalidFields);
+            const unanswered = parseOptionalCount(rawUnanswered, "Unanswered", invalidFields);
 
             if (typeof examName !== "string" || !examName.trim()) invalidFields.push("Exam Name");
             if (!examDate) invalidFields.push("Exam Date (use YYYY-MM-DD)");
@@ -155,6 +188,9 @@ export const uploadResults = async (req, res) => {
                 subject: subject.trim(),
                 marks,
                 maxMarks,
+                correctAnswers,
+                wrongAnswers,
+                unanswered,
                 rowNumber: index + 2,
             };
         });
@@ -242,16 +278,29 @@ export const uploadResults = async (req, res) => {
                 await connection.query(
                     `UPDATE results
                      SET max_marks = ?, obtained_marks = ?, is_published = 1,
+                         correct_answers = COALESCE(?, correct_answers),
+                         wrong_answers = COALESCE(?, wrong_answers),
+                         unanswered = COALESCE(?, unanswered),
                          updated_at = CURRENT_TIMESTAMP
                      WHERE id = ?`,
-                    [row.maxMarks, row.marks, existingResults[0].id]
+                    [row.maxMarks, row.marks, row.correctAnswers, row.wrongAnswers, row.unanswered, existingResults[0].id]
                 );
             } else {
                 await connection.query(
                     `INSERT INTO results
-                     (student_id, exam_id, subject_id, max_marks, obtained_marks, is_published)
-                     VALUES (?, ?, ?, ?, ?, 1)`,
-                    [row.studentId, examId, row.subjectId, row.maxMarks, row.marks]
+                     (student_id, exam_id, subject_id, max_marks, obtained_marks,
+                      correct_answers, wrong_answers, unanswered, is_published)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+                    [
+                        row.studentId,
+                        examId,
+                        row.subjectId,
+                        row.maxMarks,
+                        row.marks,
+                        row.correctAnswers,
+                        row.wrongAnswers,
+                        row.unanswered,
+                    ]
                 );
             }
         }

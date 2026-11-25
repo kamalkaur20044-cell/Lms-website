@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useLogout } from "@/hooks/useLogout";
+import { employeeDutyScheduleAPI, studentAPI } from "@/services/api";
 import { FaArrowLeft } from "react-icons/fa6";
+import EmployeeDashboard from "@/components/EmployeeDashboard";
+import StudentDashboard   from "@/app/student/dashboard/page";
+import StudentCourses     from "@/app/student/courses/page";
+import StudentMaterial    from "@/app/student/study-material/page";
+import StudentSchedule    from "@/app/student/schedule/page";
+import StudentLectures    from "@/app/student/lectures/page";
+import StudentAttendance  from "@/app/student/attendance/page";
+import StudentResults     from "@/app/student/results/page";
+import StudentProfile     from "@/app/student/profile/page";
 
 const navItems = [
   {
@@ -48,12 +58,169 @@ const navItems = [
     href: "/admin/hero-banners",
     icon: "M4 6h16M4 12h16M4 18h16M7 3v18m10-18v18",
   },
+  {
+    label: "Duty Schedules",
+    href: "/admin/duty-schedule",
+    icon: "M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2zm3 10h3m-3 4h5",
+  },
 ];
+
+const previewIcons = {
+  home: navItems[0].icon,
+  students: navItems[1].icon,
+  results: navItems[2].icon,
+  courses: navItems[3].icon,
+  staff: navItems[4].icon,
+  faculty: navItems[5].icon,
+  gallery: navItems[6].icon,
+  banners: navItems[7].icon,
+  dutySchedules: navItems[8].icon,
+  profile: "M20 21a8 8 0 00-16 0m8-10a4 4 0 100-8 4 4 0 000 8z",
+  attendance: "M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2zm3 10h3m-3 4h8",
+  schedule: "M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z",
+  documents: "M7 3h7l5 5v13H7a2 2 0 01-2-2V5a2 2 0 012-2zm7 0v5h5m-9 5h5m-5 4h5",
+  announcements: "M11 5l6-3v20l-6-3H5a2 2 0 01-2-2v-8a2 2 0 012-2h6zm0 0v14m-5 0l2 5h4l-2-5",
+  help: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-4 4v-4z",
+  upload: "M12 16V4m0 0L7 9m5-5l5 5M4 16v4h16v-4",
+  settings: "M12 8a4 4 0 100 8 4 4 0 000-8zm8 4a8 8 0 00-.1-1.2l2-1.5-2-3.5-2.4 1a8 8 0 00-2.1-1.2L15 3h-4l-.4 2.6a8 8 0 00-2.1 1.2l-2.4-1-2 3.5 2 1.5a8 8 0 000 2.4l-2 1.5 2 3.5 2.4-1a8 8 0 002.1 1.2L11 21h4l.4-2.6a8 8 0 002.1-1.2l2.4 1 2-3.5-2-1.5A8 8 0 0020 12z",
+};
+
+const teacherPreviewSections = [
+  { title: "Overview", items: [{ id: "dashboard",     label: "Dashboard",        icon: previewIcons.home }] },
+  {
+    title: "My Work",
+    items: [
+      { id: "profile",       label: "My Profile",       icon: previewIcons.profile },
+      { id: "attendance",    label: "Attendance",        icon: previewIcons.attendance },
+      { id: "results",       label: "Results",           icon: previewIcons.results },
+      { id: "leave",         label: "Leave Management",  icon: previewIcons.schedule },
+      { id: "schedule",      label: "Duty Schedule",     icon: previewIcons.schedule },
+      { id: "documents",     label: "My Documents",      icon: previewIcons.documents },
+    ],
+  },
+  {
+    title: "Communication",
+    items: [
+      { id: "announcements", label: "Announcements",  icon: previewIcons.announcements },
+      { id: "help",          label: "HR Help Desk",   icon: previewIcons.help },
+      { id: "content",       label: "Content Upload", icon: previewIcons.upload },
+    ],
+  },
+  { title: "Preferences", items: [{ id: "settings", label: "Settings", icon: previewIcons.settings }] },
+];
+
+// staff has same sections as teacher (no "results" tab, filtered inside EmployeeDashboard)
+const staffPreviewSections = teacherPreviewSections;
+
+const roleMenuSections = {
+  admin: [{ title: "", items: navItems }],
+  student: [{
+    title: "",
+    items: [
+      { id: "dashboard", label: "Dashboard",         icon: previewIcons.home },
+      { id: "courses",   label: "My Courses",        icon: previewIcons.courses },
+      { id: "material",  label: "Study Material",    icon: previewIcons.documents },
+      { id: "schedule",  label: "Class Schedule",    icon: previewIcons.schedule },
+      { id: "lectures",  label: "Recorded Lectures", icon: previewIcons.documents },
+      { id: "attendance",label: "Attendance",        icon: previewIcons.attendance },
+      { id: "results",   label: "Results",           icon: previewIcons.results },
+      { id: "profile",   label: "My Profile",        icon: previewIcons.profile },
+    ],
+  }],
+  teacher: teacherPreviewSections,
+  staff:   staffPreviewSections,
+};
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [previewRole, setPreviewRole] = useState("admin");
+  const [previewSection, setPreviewSection] = useState("dashboard");
+  const [students, setStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [previewEmployees, setPreviewEmployees] = useState([]);
+  const [previewEmployeeId, setPreviewEmployeeId] = useState("");
+  const [previewEmployeesLoading, setPreviewEmployeesLoading] = useState(false);
+  const [previewEmployeesError, setPreviewEmployeesError] = useState("");
   const { loggingOut, handleLogout } = useLogout();
+  const isPreviewingRole = previewRole !== "admin";
+
+  useEffect(() => {
+    if (previewRole !== "student") return undefined;
+    let active = true;
+    setStudentsLoading(true);
+    setStudentsError("");
+
+    studentAPI.getAll()
+      .then((response) => {
+        if (!response.success || !Array.isArray(response.data)) {
+          throw new Error(response.message || "Could not load students");
+        }
+        if (active) setStudents(response.data);
+      })
+      .catch((error) => {
+        console.error("Failed to load students for portal access:", error);
+        if (active) setStudentsError("Could not load students. Please try again.");
+      })
+      .finally(() => {
+        if (active) setStudentsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [previewRole]);
+
+  useEffect(() => {
+    if (previewRole !== "teacher" && previewRole !== "staff") return undefined;
+    let active = true;
+    setPreviewEmployeesLoading(true);
+    setPreviewEmployeesError("");
+
+    employeeDutyScheduleAPI.getAll()
+      .then((response) => {
+        if (!response.success || !Array.isArray(response.data)) {
+          throw new Error(response.message || "Could not load employees");
+        }
+        if (!active) return;
+        const roleEmployees = response.data.filter((employee) =>
+          employee.employee_type === previewRole && employee.status === "active"
+        );
+        setPreviewEmployees(roleEmployees);
+        setPreviewEmployeeId((current) =>
+          roleEmployees.some((employee) => String(employee.id) === current)
+            ? current
+            : String(roleEmployees[0]?.id || "")
+        );
+      })
+      .catch((error) => {
+        if (active) setPreviewEmployeesError(error.message || "Could not load employees");
+      })
+      .finally(() => {
+        if (active) setPreviewEmployeesLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [previewRole]);
+
+  const handleRoleChange = (role) => {
+    setPreviewRole(role);
+    setPreviewSection("dashboard");
+    setSelectedStudentId("");
+  };
+
+  const rolePills = [
+    { value: "admin",   label: "Admin"   },
+    { value: "student", label: "Student" },
+    { value: "teacher", label: "Teacher" },
+    { value: "staff",   label: "Staff"   },
+  ];
+
+  const previewRoleLabel = rolePills.find((r) => r.value === previewRole)?.label ?? previewRole;
 
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
@@ -87,35 +254,150 @@ export default function AdminLayout({ children }) {
 
         {/* Nav links */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest px-3 mb-3">Main Menu</p>
-          {navItems.map(({ label, href, icon, badge }) => {
-            const isActive = pathname === href;
-            return (
-              <Link
-                key={label}
-                href={href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative
-                  ${isActive
-                    ? "bg-[#C8102E] text-white shadow-md shadow-red-900/30"
-                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                  }`}
+
+          {/* ── Role Switcher ── */}
+          <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+            View As
+          </p>
+          <div className="mb-4 grid grid-cols-2 gap-1.5">
+            {rolePills.map(({ value, label }) => {
+              const isActive = previewRole === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => handleRoleChange(value)}
+                  title={`Preview ${label} dashboard`}
+                  className={`flex items-center gap-1.5 px-2 py-2 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer
+                    ${isActive
+                      ? "bg-[#C8102E] text-white shadow-md shadow-red-900/40 ring-1 ring-[#C8102E]"
+                      : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10"
+                    }`}
+                >
+                  <span className="truncate">{label}</span>
+                  {isActive && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F5C518] flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {previewRole === "student" && (
+            <div className="mb-3">
+              <label htmlFor="portal-student" className="sr-only">Choose student</label>
+              <select
+                id="portal-student"
+                value={selectedStudentId}
+                onChange={(event) => setSelectedStudentId(event.target.value)}
+                disabled={studentsLoading || Boolean(studentsError)}
+                className="w-full rounded-lg border border-white/10 bg-[#25253a] px-3 py-2 text-sm text-white focus:border-[#F5C518] focus:outline-none focus:ring-2 focus:ring-[#F5C518]/30 disabled:opacity-60"
               >
-                <svg className="w-4.5 h-4.5 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-                </svg>
-                <span>{label}</span>
-                {badge && (
-                  <span className="ml-auto text-xs bg-[#F5C518] text-[#1a1a2e] font-bold px-1.5 py-0.5 rounded-full">
-                    {badge}
-                  </span>
-                )}
-                {isActive && (
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F5C518] rounded-l-full" />
-                )}
-              </Link>
-            );
-          })}
+                <option value="">
+                  {studentsLoading
+                    ? "Loading students..."
+                    : studentsError
+                      ? "Students unavailable"
+                      : students.length
+                        ? "Choose a student"
+                        : "No students found"}
+                </option>
+                {students.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.first_name} {student.last_name} · {student.admission_number}
+                  </option>
+                ))}
+              </select>
+              {studentsError && <p role="alert" className="mt-2 px-1 text-xs text-red-300">{studentsError}</p>}
+            </div>
+          )}
+          {(previewRole === "teacher" || previewRole === "staff") && (
+            <div className="mb-3">
+              <label htmlFor="portal-employee" className="sr-only">Choose employee</label>
+              <select
+                id="portal-employee"
+                value={previewEmployeeId}
+                onChange={(event) => setPreviewEmployeeId(event.target.value)}
+                disabled={previewEmployeesLoading || Boolean(previewEmployeesError) || !previewEmployees.length}
+                className="w-full rounded-lg border border-white/10 bg-[#25253a] px-3 py-2 text-sm text-white focus:border-[#F5C518] focus:outline-none focus:ring-2 focus:ring-[#F5C518]/30 disabled:opacity-60"
+              >
+                <option value="">
+                  {previewEmployeesLoading
+                    ? "Loading employees..."
+                    : previewEmployeesError
+                      ? "Employees unavailable"
+                      : previewEmployees.length
+                        ? "Choose an employee"
+                        : "No active employees"}
+                </option>
+                {previewEmployees.map((employee) => (
+                  <option key={employee.id} value={employee.id}>
+                    {employee.first_name} {employee.last_name || ""} · {employee.employee_id}
+                  </option>
+                ))}
+              </select>
+              {previewEmployeesError && <p role="alert" className="mt-2 px-1 text-xs text-red-300">{previewEmployeesError}</p>}
+            </div>
+          )}
+          {roleMenuSections[previewRole].map(({ title, items }, sectionIndex) => (
+            <div key={title || sectionIndex} className={sectionIndex ? "mt-4" : ""}>
+              {title && (
+                <p className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+                  {title}
+                </p>
+              )}
+              <div className="space-y-1">
+                {items.map(({ id, label, href, icon, badge }) => {
+                  const isActive = !isPreviewingRole && pathname === href;
+                  const isPreviewActive = isPreviewingRole && previewSection === id;
+                  const className = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative w-full text-left
+                    ${isActive || isPreviewActive
+                      ? "bg-[#C8102E] text-white shadow-md shadow-red-900/30"
+                      : "text-gray-400 hover:bg-white/5 hover:text-white"
+                    }`;
+                  const content = (
+                    <>
+                      <svg className="w-4.5 h-4.5 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+                      </svg>
+                      <span>{label}</span>
+                      {badge && (
+                        <span className="ml-auto rounded-full bg-[#F5C518] px-1.5 py-0.5 text-xs font-bold text-[#1a1a2e]">
+                          {badge}
+                        </span>
+                      )}
+                      {(isActive || isPreviewActive) && (
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F5C518] rounded-l-full" />
+                      )}
+                    </>
+                  );
+
+                  // Preview roles — clickable buttons that switch content section
+                  if (isPreviewingRole) {
+                    return (
+                      <button
+                        key={label}
+                        onClick={() => { setPreviewSection(id); setSidebarOpen(false); }}
+                        className={className}
+                      >
+                        {content}
+                      </button>
+                    );
+                  }
+
+                  // Admin — normal links
+                  return (
+                    <Link
+                      key={label}
+                      href={href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={className}
+                    >
+                      {content}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Bottom — back to site */}
@@ -199,8 +481,65 @@ export default function AdminLayout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">
-          {children}
+        <main className="flex-1 overflow-auto">
+          {!isPreviewingRole ? (
+            /* Normal admin content */
+            <div className="p-4 sm:p-6">{children}</div>
+
+          ) : previewRole === "student" && !selectedStudentId ? (
+            /* Student pill but no student chosen yet */
+            <div className="flex flex-col items-center justify-center h-full min-h-[60vh] gap-4 text-center px-6">
+              <div className="w-16 h-16 rounded-2xl bg-[#1a1a2e] flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-800 font-semibold text-base">Select a student to preview</p>
+                <p className="text-gray-400 text-sm mt-1">Choose a student from the sidebar to view their portal.</p>
+              </div>
+            </div>
+
+          ) : previewRole === "student" ? (
+            /* Student — render the right page component based on previewSection */
+            <div className="p-4 sm:p-6">
+              {previewSection === "dashboard"  && <StudentDashboard  studentId={selectedStudentId} />}
+              {previewSection === "courses"    && <StudentCourses    studentId={selectedStudentId} />}
+              {previewSection === "material"   && <StudentMaterial />}
+              {previewSection === "schedule"   && <StudentSchedule />}
+              {previewSection === "lectures"   && <StudentLectures />}
+              {previewSection === "attendance" && <StudentAttendance />}
+              {previewSection === "results"    && <StudentResults    studentId={selectedStudentId} />}
+              {previewSection === "profile"    && <StudentProfile    studentId={selectedStudentId} />}
+            </div>
+
+          ) : previewRole === "teacher" ? (
+            /* Teacher — EmployeeDashboard content only, section controlled by sidebar */
+            <div className="p-4 sm:p-6">
+              <EmployeeDashboard
+                key={`teacher-${previewSection}`}
+                allowedRoles={["teacher", "admin"]}
+                noLayout
+                defaultSection={previewSection}
+                scheduleEmployeeType="teacher"
+                scheduleEmployeeId={previewEmployeeId}
+              />
+            </div>
+
+          ) : previewRole === "staff" ? (
+            /* Staff — same as teacher without results tab */
+            <div className="p-4 sm:p-6">
+              <EmployeeDashboard
+                key={`staff-${previewSection}`}
+                allowedRoles={["staff", "admin"]}
+                noLayout
+                defaultSection={previewSection}
+                scheduleEmployeeType="staff"
+                scheduleEmployeeId={previewEmployeeId}
+              />
+            </div>
+
+          ) : null}
         </main>
       </div>
       </div>

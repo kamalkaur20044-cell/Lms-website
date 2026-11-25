@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -9,12 +9,16 @@ import { useLogout } from "@/hooks/useLogout";
 import Icon from "@/components/Icon";
 import { icons } from "./icons";
 
-const ALLOWED_ROLES = ["student"];
+const ALLOWED_ROLES = ["student", "admin"];
 
 const navItems = [
   { label: "Dashboard", href: "/student/dashboard", icon: icons.home },
   { label: "My Courses", href: "/student/courses", icon: icons.book },
   { label: "Study Material", href: "/student/study-material", icon: icons.document },
+  { label: "Test & Exams", href: "/student/tests", icon: icons.clipboardCheck },
+  { label: "Analysis", href: "/student/analysis", icon: icons.chart },
+  { label: "Student Support", href: "/student/support", icon: icons.support },
+  { label: "Question Bank", href: "/student/question-bank", icon: icons.question },
   { label: "Class Schedule", href: "/student/schedule", icon: icons.calendar },
   { label: "Recorded Lectures", href: "/student/lectures", icon: icons.video },
   { label: "Attendance", href: "/student/attendance", icon: icons.clipboardCheck },
@@ -31,14 +35,36 @@ function readUsername() {
   }
 }
 
+function readAdminPortalContext() {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const studentId = params.get("studentId");
+  if (params.get("adminView") !== "1" || !studentId) return null;
+
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user.role === "admin" ? { studentId } : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function StudentLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [username] = useState(readUsername);
+  const [adminPortalContext, setAdminPortalContext] = useState(null);
   const { loggingOut, handleLogout } = useLogout();
+
+  useEffect(() => {
+    setAdminPortalContext(readAdminPortalContext());
+  }, [pathname]);
 
   const current = navItems.find((item) => pathname.startsWith(item.href));
   const initial = (username || "S").charAt(0).toUpperCase();
+  const portalQuery = adminPortalContext
+    ? `?adminView=1&studentId=${encodeURIComponent(adminPortalContext.studentId)}`
+    : "";
 
   return (
     <ProtectedRoute allowedRoles={ALLOWED_ROLES}>
@@ -69,7 +95,7 @@ export default function StudentLayout({ children }) {
                 return (
                   <Link
                     key={href}
-                    href={href}
+                    href={`${href}${portalQuery}`}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative
                       ${active ? "bg-[#C8102E] text-white shadow-md shadow-red-900/30" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}
@@ -83,6 +109,15 @@ export default function StudentLayout({ children }) {
             </nav>
 
             <div className="px-3 py-4 border-t border-white/10 space-y-2">
+              {adminPortalContext && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-yellow-300 hover:bg-white/5 hover:text-white transition-all"
+                >
+                  <Icon d={icons.back} />
+                  Back to Admin
+                </Link>
+              )}
               <Link
                 href="/"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all"
@@ -90,25 +125,13 @@ export default function StudentLayout({ children }) {
                 <Icon d={icons.back} />
                 Back to Website
               </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-300 bg-red-950/40 hover:bg-[#C8102E] hover:text-white border border-red-500/20 hover:border-[#C8102E] transition-all duration-200 shadow-xs group cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="w-6 h-6 rounded-lg bg-red-500/20 group-hover:bg-white/20 flex items-center justify-center text-red-400 group-hover:text-white transition-colors">
-                    <Icon d={icons.logout} />
-                  </span>
-                  <span>Logout Account</span>
-                </div>
-                <span className="text-[10px] text-red-400/80 group-hover:text-white/80 font-mono">Sign out →</span>
-              </button>
               <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
                 <div className="w-8 h-8 rounded-full bg-[#C8102E] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                   {initial}
                 </div>
                 <div className="min-w-0">
                   <p className="text-white text-xs font-semibold truncate">{username || "Student"}</p>
-                  <p className="text-gray-500 text-xs truncate">Student</p>
+                  <p className="text-gray-500 text-xs truncate">{adminPortalContext ? "Admin account" : "Student"}</p>
                 </div>
               </div>
             </div>

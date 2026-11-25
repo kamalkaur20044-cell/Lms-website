@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { resultAPI } from "@/services/api";
+import StudentResultAnalysis from "@/components/StudentResultAnalysis";
 
 function getGrade(percentage) {
   if (percentage >= 90) return "A+";
@@ -27,6 +28,7 @@ export default function AdminResultsPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loadError, setLoadError] = useState("");
+  const [selectedResult, setSelectedResult] = useState(null);
 
   const loadResults = useCallback(async () => {
     const response = await resultAPI.getAll();
@@ -117,6 +119,10 @@ export default function AdminResultsPage() {
     }
   };
 
+  if (selectedResult) {
+    return <StudentResultAnalysis result={selectedResult} onBack={() => setSelectedResult(null)} />;
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -144,7 +150,8 @@ export default function AdminResultsPage() {
           <h2 className="text-sm font-bold text-[#1a1a2e]">Import results from Excel</h2>
           <p className="mt-1 text-xs text-gray-500">
             Use columns: Exam Name, Exam Date, Admission Number, Subject, Marks, Maximum Marks.
-            Each row represents one student and subject. Exam name and date are saved to exams; subjects must already exist.
+            Each row represents one student and subject. Optional columns: Correct Answers, Wrong Answers, Unanswered.
+            Exam name and date are saved to exams; subjects must already exist.
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -207,10 +214,17 @@ export default function AdminResultsPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filteredResults.map((result) => (
-                <tr key={`${result.exam_id}-${result.student_id}`} className="transition-colors hover:bg-gray-50">
+                <tr
+                  key={`${result.exam_id}-${result.student_id}`}
+                  onClick={() => setSelectedResult(result)}
+                  className="cursor-pointer transition-colors hover:bg-blue-50/60 focus-visible:bg-blue-50/60 focus-visible:outline-none"
+                >
                   <th scope="row" className="px-4 py-3.5 text-left">
-                    <p className="whitespace-nowrap font-semibold text-[#1a1a2e]">{result.student_name}</p>
-                    <p className="mt-0.5 font-mono text-xs font-normal text-gray-400">{result.admission_number}</p>
+                    <button type="button" onClick={(event) => { event.stopPropagation(); setSelectedResult(result); }} className="text-left focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E]">
+                      <span className="block whitespace-nowrap font-semibold text-[#1a1a2e]">{result.student_name}</span>
+                      <span className="mt-0.5 block font-mono text-xs font-normal text-gray-400">{result.admission_number}</span>
+                      <span className="sr-only">Open performance analysis</span>
+                    </button>
                   </th>
                   {subjects.map((subjectName) => {
                     const subject = result.subjects.find((item) => item.name === subjectName);

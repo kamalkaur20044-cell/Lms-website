@@ -3,12 +3,38 @@ import db from '../config/db.js';
 const getStudentByUser = async (userId) => {
   const [rows] = await db.query(
     `SELECT s.id, s.admission_number, s.first_name, s.last_name, s.date_of_birth, s.gender,
-            s.phone, s.address, s.photo, s.admission_date, s.status, u.username
+            s.phone, s.address, s.admission_date, s.status, u.username
      FROM students s INNER JOIN users u ON s.user_id = u.id
      WHERE s.user_id = ?`,
     [userId]
   );
   return rows[0] || null;
+};
+
+const getStudentById = async (studentId) => {
+  const [rows] = await db.query(
+    `SELECT s.id, s.admission_number, s.first_name, s.last_name, s.date_of_birth, s.gender,
+            s.phone, s.address, s.admission_date, s.status, u.username
+     FROM students s INNER JOIN users u ON s.user_id = u.id
+     WHERE s.id = ?`,
+    [studentId]
+  );
+  return rows[0] || null;
+};
+
+const getStudentForPortal = async (req) => {
+  if (req.user.role !== 'admin') {
+    return getStudentByUser(req.user.user_id);
+  }
+
+  const studentId = Number(req.query.studentId);
+  if (!Number.isSafeInteger(studentId) || studentId < 1) {
+    const error = new Error('A valid studentId is required for admin access');
+    error.status = 400;
+    throw error;
+  }
+
+  return getStudentById(studentId);
 };
 
 const getBatches = async (studentId) => {
@@ -29,7 +55,7 @@ const getBatches = async (studentId) => {
 // GET /api/student-portal/profile
 export const getProfile = async (req, res) => {
   try {
-    const student = await getStudentByUser(req.user.user_id);
+    const student = await getStudentForPortal(req);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student record not found' });
     }
@@ -42,6 +68,9 @@ export const getProfile = async (req, res) => {
     const batches = await getBatches(student.id);
     res.status(200).json({ success: true, data: { student, parents, batches } });
   } catch (error) {
+    if (error.status === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     console.error('Error fetching student profile:', error);
     res.status(500).json({ success: false, message: 'Error fetching profile' });
   }
@@ -50,7 +79,7 @@ export const getProfile = async (req, res) => {
 // GET /api/student-portal/courses
 export const getCourses = async (req, res) => {
   try {
-    const student = await getStudentByUser(req.user.user_id);
+    const student = await getStudentForPortal(req);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student record not found' });
     }
@@ -76,6 +105,9 @@ export const getCourses = async (req, res) => {
     }));
     res.status(200).json({ success: true, data });
   } catch (error) {
+    if (error.status === 400) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     console.error('Error fetching student courses:', error);
     res.status(500).json({ success: false, message: 'Error fetching courses' });
   }

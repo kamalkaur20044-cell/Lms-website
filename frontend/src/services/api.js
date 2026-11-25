@@ -88,9 +88,25 @@ export const staffAPI = {
   delete: (id) => apiFetch(`/staff/${id}`, { method: 'DELETE' }),
 };
 
+export const employeeDutyScheduleAPI = {
+  getAll: () => apiFetch('/duty-schedules'),
+  getMine: () => apiFetch('/duty-schedules/mine'),
+  getForEmployee: (employeeType, employeeId) =>
+    apiFetch(`/duty-schedules/employee/${encodeURIComponent(employeeType)}/${encodeURIComponent(employeeId)}`),
+  save: (employeeType, employeeId, data) =>
+    apiFetch(`/duty-schedules/${encodeURIComponent(employeeType)}/${encodeURIComponent(employeeId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (employeeType, employeeId) =>
+    apiFetch(`/duty-schedules/${encodeURIComponent(employeeType)}/${encodeURIComponent(employeeId)}`, {
+      method: 'DELETE',
+    }),
+};
+
 export const courseAPI = {
-  getPublic: () => apiFetch('/courses/public'),
-  getAll: () => apiFetch('/courses'),
+  getPublic: () => apiFetch('/courses/public', { cache: 'no-store' }),
+  getAll: () => apiFetch('/courses', { cache: 'no-store' }),
   create: (data) =>
     apiFetch('/courses', {
       method: 'POST',
@@ -137,7 +153,8 @@ export const heroBannerAPI = {
 
 export const resultAPI = {
   getAll: () => apiFetch('/results'),
-  getMine: () => apiFetch('/results/mine'),
+  getMine: (studentId) =>
+    apiFetch(`/results/mine${studentId ? `?studentId=${encodeURIComponent(studentId)}` : ''}`),
   upload: (formData) =>
     apiFetch('/results/upload', {
       method: 'POST',
@@ -146,6 +163,8 @@ export const resultAPI = {
 };
 
 export const studentPortalAPI = {
-  getProfile: () => apiFetch('/student-portal/profile'),
-  getCourses: () => apiFetch('/student-portal/courses'),
+  getProfile: (studentId) =>
+    apiFetch(`/student-portal/profile${studentId ? `?studentId=${encodeURIComponent(studentId)}` : ''}`),
+  getCourses: (studentId) =>
+    apiFetch(`/student-portal/courses${studentId ? `?studentId=${encodeURIComponent(studentId)}` : ''}`),
 };

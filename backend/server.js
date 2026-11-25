@@ -12,6 +12,7 @@ import courseRoutes  from "./routes/courseRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
 import heroBannerRoutes from "./routes/heroBannerRoutes.js";
 import studentPortalRoutes from "./routes/studentPortalRoutes.js";
+import dutyScheduleRoutes from "./routes/dutyScheduleRoutes.js";
 import resultRoutes from "./routes/resultRoutes.js"
 
 dotenv.config();
@@ -55,13 +56,18 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/hero-banners", heroBannerRoutes);
 app.use("/api/student-portal", studentPortalRoutes);
+app.use("/api/duty-schedules", dutyScheduleRoutes);
 app.use("/api/results",resultRoutes);
 
 app.get("/", (req, res) => {
     res.send("Lakshya LMS Backend is running!");
 });
 
-const PORT = process.env.PORT;
+const configuredPort = process.env.PORT;
+const PORT = configuredPort ? Number(configuredPort) : 5000;
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+    throw new Error("PORT must be an integer between 1 and 65535");
+}
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -19,33 +19,45 @@ const stats = [
 const quickLinks = [
   { label: "Recorded Lectures", href: "/student/lectures", color: "bg-[#C8102E]", icon: icons.video },
   { label: "Study Material", href: "/student/study-material", color: "bg-green-500", icon: icons.document },
+  { label: "Test & Exams", href: "/student/tests", color: "bg-indigo-500", icon: icons.clipboardCheck },
+  { label: "Analysis", href: "/student/analysis", color: "bg-[#0f3460]", icon: icons.chart },
+  { label: "Student Support", href: "/student/support", color: "bg-amber-500", icon: icons.support },
+  { label: "Question Bank", href: "/student/question-bank", color: "bg-purple-500", icon: icons.question },
   { label: "Class Schedule", href: "/student/schedule", color: "bg-[#1a1a2e]", icon: icons.calendar },
   { label: "Attendance", href: "/student/attendance", color: "bg-indigo-500", icon: icons.clipboardCheck },
 ];
 
 const pendingSections = [
   ["Today's Timetable", "Your timetable will appear here once it is added."],
-  ["Upcoming Tests", "No upcoming tests yet."],
+  ["Exam Preparation", "Review your latest results and use them to choose a focus for your next study session."],
   ["Pending Assignments", "No pending assignments."],
   ["Recent Results", "Your exam results will appear here."],
   ["Latest Announcements", "No announcements yet."],
   ["Recently Watched Lectures", "Lectures you watch will appear here."],
   ["Study Targets", "Daily and weekly targets will appear here."],
-  ["Academic Progress", "Your progress overview will appear here."],
+  ["Academic Progress", "Review your subject-wise performance in the Analysis section."],
 ];
 
-export default function StudentDashboard() {
+export default function StudentDashboard({ studentId: studentIdProp } = {}) {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [portalQuery, setPortalQuery] = useState("");
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // prop takes priority (admin preview), fallback to URL param (normal student portal)
+    const studentId = studentIdProp || params.get("studentId");
+    if (studentId) {
+      setPortalQuery(`?adminView=1&studentId=${encodeURIComponent(studentId)}`);
+    }
+
     studentPortalAPI
-      .getProfile()
+      .getProfile(studentId)
       .then((res) => (res.success ? setProfile(res.data) : setError(res.message || "Could not load profile")))
       .catch(() => setError("Network error. Please try again."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [studentIdProp]);
 
   const student = profile?.student;
   const batch = profile?.batches?.[0];
@@ -107,7 +119,7 @@ export default function StudentDashboard() {
             {quickLinks.map(({ label, href, icon, color }) => (
               <Link
                 key={href}
-                href={href}
+                href={`${href}${portalQuery}`}
                 className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition-shadow"
               >
                 <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center text-white`}>

@@ -19,21 +19,25 @@ function formatDate(value) {
   return value ? new Date(value).toLocaleDateString() : "Date not provided";
 }
 
-export default function StudentResults() {
+export default function StudentResults({ studentId: studentIdProp } = {}) {
   const [results, setResults] = useState([]);
   const [selectedExam, setSelectedExam] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    resultAPI.getMine()
+    const params = new URLSearchParams(window.location.search);
+    const studentId = studentIdProp || params.get("studentId");
+    const examId = params.get("examId");
+    resultAPI.getMine(studentId)
       .then((response) => {
         if (!response.success) throw new Error(response.message || "Could not load your results");
         setResults(response.data);
+        if (examId) setSelectedExam(examId);
       })
       .catch((requestError) => setError(requestError.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [studentIdProp]);
 
   const result = results.find((item) => String(item.exam_id) === selectedExam) || results[0];
   const activeExamId = result ? String(result.exam_id) : "";

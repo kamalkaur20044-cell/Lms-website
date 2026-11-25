@@ -5,7 +5,7 @@ import { roleMiddleware } from '../middleware/roleMiddleware.js';
 
 const router = express.Router();
 
-router.use(authMiddleware, roleMiddleware('student'));
+router.use(authMiddleware, roleMiddleware('student', 'admin'));
 
 router.get('/profile', getProfile);
 router.get('/courses', getCourses);
